@@ -30,18 +30,17 @@ def completion(message, model, system_prompt="", image_paths=None, temperature=0
     api_key = os.getenv("OPENAI_API_KEY")
     base_url = os.getenv("OPENAI_API_BASE")
 
-    # 创建OpenAiClient实例
+    # Initialize OpenAiClient
     client = OpenAiClient.OpenAiClient(base_url=base_url, api_key=api_key, model=model)
-    # 调用completion方法，增加失败重试机制
+    # Call completion method with retry mechanism
     for _ in range(retry_times):
         try:
             response = client.completion(user_message=message, system_prompt=system_prompt, image_paths=image_paths, temperature=temperature, max_tokens=max_tokens)
             return response
         except Exception as e:
-            print(f"LLM调用失败: {str(e)}")
-            # 等待500毫秒后重试
+            logger.error(f"LLM call failed: {str(e)}")
+            # If retry fails, wait for a while before retrying
             time.sleep(0.5)
-    # 如果重试失败，返回空字符串
     return ""
 
 
