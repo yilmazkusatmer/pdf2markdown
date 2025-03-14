@@ -70,7 +70,7 @@ class LLMClient:
             
         except Exception as e:
             logger.error(f"API request failed: {str(e)}")
-            return ""
+            raise e
     
     def encode_image(self, image_path: str) -> str:
         import base64

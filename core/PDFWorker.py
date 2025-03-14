@@ -14,6 +14,15 @@ class PDFWorker:
         self.reader = PyPDF2.PdfReader(pdf_path)
         self.total_pages = len(self.reader.pages) 
 
+    def get_total_pages(self) -> int:
+        """
+        Get the total number of pages in the PDF
+
+        Returns:
+            int: Total number of pages
+        """
+        return self.total_pages
+
     def extract_pages(self, start_page: int, end_page: int, output_dir: str = ".", output_name: str = None) -> str:
         """
         Extract PDF content from specified page range
@@ -59,14 +68,13 @@ class PDFWorker:
             logger.error(f"Failed to extract pages: {str(e)}")
             return ""
 
-    def convert_to_images(self, output_dir: str = ".", prefix: str = None, dpi: int = 200, fmt: str = 'jpg') -> List[str]:
+    def convert_to_images(self, output_dir: str = ".", dpi: int = 300, fmt: str = 'jpg') -> List[str]:
         """
         Convert each PDF page to high-quality images using PyMuPDF
         
         Args:
             output_dir (str): Output directory path
-            prefix (str): Output filename prefix (optional)
-            dpi (int): Output image resolution (default 200)
+            dpi (int): Output image resolution (default 300)
             fmt (str): Image format (supports jpg/png, default jpg)
             
         Returns:
@@ -75,14 +83,13 @@ class PDFWorker:
         try:
             import fitz  # PyMuPDF
             os.makedirs(output_dir, exist_ok=True)
-            prefix = prefix or os.path.basename(self.pdf_path).rsplit('.', 1)[0]
             img_paths = []
 
             doc = fitz.open(self.pdf_path)
             for page_num in range(len(doc)):
                 page = doc.load_page(page_num)
                 pix = page.get_pixmap(dpi=dpi)
-                output_path = os.path.join(output_dir, f"page_{page_num+1:03d}.{fmt}")
+                output_path = os.path.join(output_dir, f"page_{page_num+1:04d}.{fmt}")
                 pix.save(output_path)
                 img_paths.append(output_path)
             
