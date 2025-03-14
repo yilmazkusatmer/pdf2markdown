@@ -58,7 +58,7 @@ python main.py page_start page_end < tests/input.pdf > output.md
 
 ## Docker Usage
 ```bash
-docker run -e OPENAI_API_KEY=<your-api-key> -e OPENAI_API_BASE=<your-api-base> -e OPENAI_DEFAULT_MODEL=<your-model> jorben/markpdfdown < tests/input.pdf > output.md
+docker run -i -e OPENAI_API_KEY=<your-api-key> -e OPENAI_API_BASE=<your-api-base> -e OPENAI_DEFAULT_MODEL=<your-model> jorben/markpdfdown < tests/input.pdf > output.md
 ```
 
 ## Requirements
