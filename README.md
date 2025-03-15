@@ -1,18 +1,17 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/jorben/markpdfdown/refs/heads/master/tests/markpdfdown.png" alt="Logo" width="300" />
-<br/>
-  <br>
-  <h1>MarkPDFDown</h1>
+
+<h1>MarkPDFDown</h1>
+
+[![Size]][hub_url]
+[![Pulls]][hub_url]
+[![Tag]][tag_url]
+[![License]][license_url]
+<p>A powerful tool that leverages multimodal large language models to transcribe PDF files into Markdown format.</p>
+
+![markpdfdown](https://raw.githubusercontent.com/jorben/markpdfdown/refs/heads/master/tests/markpdfdown.png")
+
 </div>
-<p align="center">
-  <a href="https://github.com/jorben/markpdfdown/blob/main/LICENSE">
-    <img alt="GitHub License" src="https://img.shields.io/github/license/jorben/markpdfdown">
-  </a>
-  <a href="https://github.com/jorben/markpdfdown/releases">
-    <img alt="GitHub release" src="https://img.shields.io/github/release/jorben/markpdfdown.svg">
-  </a>
-</p>
-A powerful tool that leverages multimodal large language models to transcribe PDF files into Markdown format.
+
 
 ## Overview
 
@@ -84,3 +83,12 @@ This project is licensed under the Apache License 2.0. See the LICENSE file for 
 ## Acknowledgments
 - Thanks to the developers of the multimodal AI models that power this tool
 - Inspired by the need for better PDF to Markdown conversion tools
+
+[hub_url]: https://hub.docker.com/r/jorbenzhu/markpdfdown/
+[tag_url]: https://github.com/jorben/markpdfdown/releases
+[license_url]: https://github.com/jorben/markpdfdown/blob/main/LICENSE
+
+[Size]: https://img.shields.io/docker/image-size/jorbenzhu/markpdfdown/latest?color=066da5&label=size
+[Pulls]: https://img.shields.io/docker/pulls/jorbenzhu/markpdfdown.svg?style=flat&label=pulls&logo=docker
+[Tag]: https://img.shields.io/github/release/jorben/markpdfdown.svg
+[License]: https://img.shields.io/github/license/jorben/markpdfdown
