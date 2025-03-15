@@ -8,7 +8,7 @@
 [![License]][license_url]
 <p>A powerful tool that leverages multimodal large language models to transcribe PDF files into Markdown format.</p>
 
-![markpdfdown](https://raw.githubusercontent.com/jorben/markpdfdown/refs/heads/master/tests/markpdfdown.png")
+![markpdfdown](https://raw.githubusercontent.com/jorben/markpdfdown/refs/heads/master/tests/markpdfdown.png)
 
 </div>
 
