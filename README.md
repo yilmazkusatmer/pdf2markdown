@@ -1,7 +1,7 @@
 <div align="center">
 
 <h1>MarkPDFDown</h1>
-<p align="center">English | <a href="./README.zh.md">中文</a> </p>
+<p align="center">English | <a href="./README_zh.md">中文</a> </p>
 
 [![Size]][hub_url]
 [![Pulls]][hub_url]
