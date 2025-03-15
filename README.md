@@ -13,8 +13,6 @@
 
 </div>
 
-中文介绍
-
 ## Overview
 
 MarkPDFDown is designed to simplify the process of converting PDF documents into clean, editable Markdown text. By utilizing advanced multimodal AI models, it can accurately extract text, preserve formatting, and handle complex document structures including tables, formulas, and diagrams.
