@@ -31,17 +31,18 @@ def completion(message, model="", system_prompt="", image_paths=None, temperatur
     
     # Get API key and API base URL from environment variables
     api_key = os.getenv("OPENAI_API_KEY")
-    base_url = os.getenv("OPENAI_API_BASE")
-    if not api_key or not base_url:
-        logger.error("Please set the OPENAI_API_KEY and OPENAI_API_BASE environment variables")
+    if not api_key:
+        logger.error("Please set the OPENAI_API_KEY environment variables")
         exit(1)
-
+    base_url = os.getenv("OPENAI_API_BASE")
+    if not base_url:
+        base_url = "https://api.openai.com/v1/"
+    
     # If no model is specified, use the default model
     if not model:
         model = os.getenv("OPENAI_DEFAULT_MODEL")
         if not model:
-            logger.error("Please set the OPENAI_DEFAULT_MODEL environment variable")
-            exit(1)
+            model = "gpt-4o"
 
     # Initialize LLMClient
     client = LLMClient.LLMClient(base_url=base_url, api_key=api_key, model=model)
