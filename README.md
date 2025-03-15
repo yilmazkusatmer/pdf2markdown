@@ -25,6 +25,9 @@ MarkPDFDown is designed to simplify the process of converting PDF documents into
 - **Format Preservation**: Maintains headings, lists, tables, and other formatting elements
 - **Customizable Model**: Configure the model to suit your needs
 
+## Demo
+![](https://raw.githubusercontent.com/jorben/markpdfdown/refs/heads/master/tests/demo.png)
+
 ## Installation
 
 ```bash
