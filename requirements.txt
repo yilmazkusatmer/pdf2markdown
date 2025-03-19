@@ -9,7 +9,7 @@ httpx==0.28.1
 idna==3.10
 iniconfig==2.0.0
 jiter==0.9.0
--e git+https://github.com/jorben/markpdfdown.git@496da71e4f6630d80d29a668f33048fa9bf4c155#egg=markpdfdown
+-e .
 openai==1.66.3
 packaging==24.2
 pluggy==1.5.0
