@@ -4,6 +4,7 @@ import time
 import shutil
 import logging
 from core import LLMClient, PDFWorker
+from core.Util import *
 
 logging.basicConfig(
     level=logging.INFO,
@@ -70,6 +71,7 @@ def convert_image_to_markdown(image_path):
     """
     
     response = completion(message=user_prompt, model="", image_paths=[image_path], temperature=0.3, max_tokens=8192)
+    response = remove_markdown_warp(response, "markdown")
     return response
 
 if __name__ == "__main__":
