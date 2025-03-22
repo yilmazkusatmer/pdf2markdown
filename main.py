@@ -98,7 +98,6 @@ if __name__ == "__main__":
 
     # Try to get extension from file name
     input_filename = os.path.basename(sys.stdin.buffer.name)
-    logger.info("Input file: %s", input_filename)
     input_ext = os.path.splitext(input_filename)[1]
     
     # If there is no extension or the file comes from standard input, try to determine the type by file content
@@ -107,10 +106,18 @@ if __name__ == "__main__":
         if input_data.startswith(b'%PDF-'):
             input_ext = '.pdf'
             logger.info("Recognized as PDF file by file content")
-        # You can add more file type detection
-        # elif input_data.startswith(b'PK\x03\x04'):  # DOCX, XLSX, etc. ZIP format files
-        #     input_ext = '.docx'  # Default set to docx
-        #     logger.info("Recognized as Office document file by file content")
+        # JPEG file magic number/signature is FF D8 FF DB
+        elif input_data.startswith(b'\xFF\xD8\xFF\xDB'):
+            input_ext = '.jpg'
+            logger.info("Recognized as JPEG file by file content")
+        # PNG file magic number/signature is 89 50 4E 47
+        elif input_data.startswith(b'\x89\x50\x4E\x47'):
+            input_ext = '.png'
+            logger.info("Recognized as PNG file by file content")
+        # BMP file magic number/signature is 42 4D
+        elif input_data.startswith(b'\x42\x4D'):
+            input_ext = '.bmp'
+            logger.info("Recognized as BMP file by file content")
         else:
             logger.error("Unsupported file type")
             exit(1)

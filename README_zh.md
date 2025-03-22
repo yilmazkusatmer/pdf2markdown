@@ -20,6 +20,7 @@ MarkPDFDown 是一款智能PDF转换Markdown工具，通过先进的多模态AI�
 ## 功能特性
 
 - **PDF转Markdown**：支持任意PDF文档的格式转换
+- **图片转Markdown**：支持JPG/PNG/BMP图片内容转Markdown
 - **多模态理解**：利用AI理解文档结构和内容
 - **格式保留**：完整保留标题、列表、表格等排版元素
 - **模型定制**：支持自定义AI模型参数配置
@@ -52,6 +53,9 @@ export OPENAI_DEFAULT_MODEL=<你的模型>
 
 # 运行转换程序
 python main.py < tests/input.pdf > output.md
+
+# 图片转换
+python main.py < tests/input_image.png > output.md
 ```
 
 ## 高级用法

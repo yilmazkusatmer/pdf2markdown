@@ -49,10 +49,9 @@ def create_worker(input_path: str, start_page: int = 1, end_page: int = 0):
     if ext == '.pdf':
         from .PDFWorker import PDFWorker
         worker = PDFWorker(input_path, start_page, end_page)
-    # can add other types of Worker here
-    # elif ext == '.docx':
-    #    from .DocxWorker import DocxWorker
-    #    worker = DocxWorker(input_path, start_page, end_page)
+    elif ext == '.jpg' or ext == '.jpeg' or ext == '.png' or ext == '.bmp':
+        from .ImageWorker import ImageWorker
+        worker = ImageWorker(input_path)
     else:
         raise ValueError(f"Unsupported file type: {ext}")
         

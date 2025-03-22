@@ -20,6 +20,7 @@ MarkPDFDown is designed to simplify the process of converting PDF documents into
 ## Features
 
 - **PDF to Markdown Conversion**: Transform any PDF document into well-formatted Markdown
+- **Image to Markdown Conversion**: Transform image into well-formatted Markdown
 - **Multimodal Understanding**: Leverages AI to comprehend document structure and content
 - **Format Preservation**: Maintains headings, lists, tables, and other formatting elements
 - **Customizable Model**: Configure the model to suit your needs
@@ -56,6 +57,9 @@ python main.py < tests/input.pdf > output.md
 ## Advanced Usage
 ```bash
 python main.py page_start page_end < tests/input.pdf > output.md
+
+# image to markdown
+python main.py < tests/input_image.png > output.md
 ```
 
 ## Docker Usage
