@@ -3,7 +3,8 @@ import sys
 import time
 import shutil
 import logging
-from core import LLMClient, PDFWorker
+from core import LLMClient
+from core.FileWorker import create_worker
 from core.Util import *
 
 logging.basicConfig(
@@ -84,7 +85,7 @@ if __name__ == "__main__":
         start_page = 1
         end_page = int(sys.argv[1])
 
-    # 从标准输入读取二进制数据
+    # Read binary data from standard input
     input_data = sys.stdin.buffer.read()
     if not input_data:
         logger.error("No input data received")
@@ -95,31 +96,41 @@ if __name__ == "__main__":
     output_dir = f"output/{time.strftime('%Y%m%d%H%M%S')}"
     os.makedirs(output_dir, exist_ok=True)
 
-    # Save input PDF to output directory
-    input_pdf_path = os.path.join(output_dir, "input.pdf")
-    with open(input_pdf_path, "wb") as f:
+    # Try to get extension from file name
+    input_filename = os.path.basename(sys.stdin.buffer.name)
+    logger.info("Input file: %s", input_filename)
+    input_ext = os.path.splitext(input_filename)[1]
+    
+    # If there is no extension or the file comes from standard input, try to determine the type by file content
+    if not input_ext or input_filename == '<stdin>':
+        # PDF file magic number/signature is %PDF-
+        if input_data.startswith(b'%PDF-'):
+            input_ext = '.pdf'
+            logger.info("Recognized as PDF file by file content")
+        # You can add more file type detection
+        # elif input_data.startswith(b'PK\x03\x04'):  # DOCX, XLSX, etc. ZIP format files
+        #     input_ext = '.docx'  # Default set to docx
+        #     logger.info("Recognized as Office document file by file content")
+        else:
+            logger.error("Unsupported file type")
+            exit(1)
+    
+    input_path = os.path.join(output_dir, f"input{input_ext}")
+    with open(input_path, "wb") as f:
         f.write(input_data)
 
-    pdf_worker = PDFWorker.PDFWorker(input_pdf_path)
-    total_pages = pdf_worker.get_total_pages()
-    if start_page < 1 or start_page > total_pages:
-        start_page = 1
-    if end_page == 0 or end_page > total_pages:
-        end_page = total_pages
-    logger.info("Start processing from page %d to page %d", start_page, end_page)
-
-    extract_path = input_pdf_path
-    if start_page != 1 or end_page != total_pages:
-        # Extract PDF content from specified page range
-        extract_path = pdf_worker.extract_pages(start_page, end_page, output_dir)
-        logger.info("Extract pages to %s", extract_path)
-
-    # Convert PDF to images
-    convert_worker = PDFWorker.PDFWorker(extract_path)
-    img_paths = convert_worker.convert_to_images(output_dir=output_dir)
+    # create file worker
+    try:
+        worker = create_worker(input_path, start_page, end_page)
+    except ValueError as e:
+        logger.error(str(e))
+        exit(1)
+    
+    # convert to images
+    img_paths = worker.convert_to_images()
     logger.info("Image conversion completed")
 
-    # Connvert images to Markdown
+    # convert to markdown
     markdown = ""
     for img_path in sorted(img_paths):
         img_path = img_path.replace("\\", "/")
