@@ -26,7 +26,7 @@ MarkPDFDown is designed to simplify the process of converting PDF documents into
 - **Customizable Model**: Configure the model to suit your needs
 
 ## Demo
-![](https://raw.githubusercontent.com/jorben/markpdfdown/refs/heads/master/tests/demo.png)
+![](https://raw.githubusercontent.com/jorben/markpdfdown/refs/heads/master/tests/demo_02.png)
 
 ## Installation
 

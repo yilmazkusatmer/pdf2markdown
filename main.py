@@ -68,7 +68,10 @@ def convert_image_to_markdown(image_path):
         str: Converted Markdown string
     """
     user_prompt = """
-    Please read the content in the image and transcribe it into Markdown, paying special attention to maintaining the format of headings, text, formulas, and table rows and columns. Only output the Markdown, no additional explanation is needed.
+Please read the content in the image and transcribe it into plain Markdown format. Please note:
+1. Maintain the format of headings, text, formulas, and table rows and columns
+2. Mathematical formulas should be transcribed using LaTeX syntax, ensuring consistency with the original
+3. No additional explanation is needed, and no content outside the original text should be added.
     """
     
     response = completion(message=user_prompt, model="", image_paths=[image_path], temperature=0.3, max_tokens=8192)
