@@ -9,7 +9,7 @@
 [![License]][license_url]
 <p>A powerful tool that leverages multimodal large language models to transcribe PDF files into Markdown format.</p>
 
-![markpdfdown](https://raw.githubusercontent.com/jorben/markpdfdown/refs/heads/master/tests/markpdfdown.png)
+![markpdfdown](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/markpdfdown.png)
 
 </div>
 
@@ -26,7 +26,7 @@ MarkPDFDown is designed to simplify the process of converting PDF documents into
 - **Customizable Model**: Configure the model to suit your needs
 
 ## Demo
-![](https://raw.githubusercontent.com/jorben/markpdfdown/refs/heads/master/tests/demo_02.png)
+![](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/demo_02.png)
 
 ## Installation
 
@@ -35,7 +35,7 @@ conda create -n markpdfdown python=3.9
 conda activate markpdfdown
 
 # Clone the repository
-git clone https://github.com/jorben/markpdfdown.git
+git clone https://github.com/MarkPDFdown/markpdfdown.git
 cd markpdfdown
 
 # Install dependencies
@@ -89,10 +89,10 @@ This project is licensed under the Apache License 2.0. See the LICENSE file for 
 - Inspired by the need for better PDF to Markdown conversion tools
 
 [hub_url]: https://hub.docker.com/r/jorbenzhu/markpdfdown/
-[tag_url]: https://github.com/jorben/markpdfdown/releases
-[license_url]: https://github.com/jorben/markpdfdown/blob/main/LICENSE
+[tag_url]: https://github.com/markpdfdown/markpdfdown/releases
+[license_url]: https://github.com/markpdfdown/markpdfdown/blob/main/LICENSE
 
 [Size]: https://img.shields.io/docker/image-size/jorbenzhu/markpdfdown/latest?color=066da5&label=size
 [Pulls]: https://img.shields.io/docker/pulls/jorbenzhu/markpdfdown.svg?style=flat&label=pulls&logo=docker
-[Tag]: https://img.shields.io/github/release/jorben/markpdfdown.svg
-[License]: https://img.shields.io/github/license/jorben/markpdfdown
+[Tag]: https://img.shields.io/github/release/markpdfdown/markpdfdown.svg
+[License]: https://img.shields.io/github/license/markpdfdown/markpdfdown

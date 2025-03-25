@@ -9,7 +9,7 @@
 [![License]][license_url]
 <p>基于多模态大语言模型的PDF转Markdown工具，高质量实现文档结构化转换</p>
 
-![markpdfdown](https://raw.githubusercontent.com/jorben/markpdfdown/refs/heads/master/tests/markpdfdown.png)
+![markpdfdown](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/markpdfdown.png)
 
 </div>
 
@@ -26,7 +26,7 @@ MarkPDFDown 是一款智能PDF转换Markdown工具，通过先进的多模态AI�
 - **模型定制**：支持自定义AI模型参数配置
 
 ## 示例演示
-![](https://raw.githubusercontent.com/jorben/markpdfdown/refs/heads/master/tests/demo.png)
+![](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/demo.png)
 
 ## 安装指南
 
@@ -35,7 +35,7 @@ conda create -n markpdfdown python=3.9
 conda activate markpdfdown
 
 # 克隆仓库
-git clone https://github.com/jorben/markpdfdown.git
+git clone https://github.com/MarkPDFdown/markpdfdown.git
 cd markpdfdown
 
 # 安装依赖
@@ -91,10 +91,10 @@ docker run -i -e OPENAI_API_KEY=<你的API密钥> -e OPENAI_API_BASE=<你的API�
 - 受PDF转Markdown工具需求启发而开发
 
 [hub_url]: https://hub.docker.com/r/jorbenzhu/markpdfdown/
-[tag_url]: https://github.com/jorben/markpdfdown/releases
-[license_url]: https://github.com/jorben/markpdfdown/blob/main/LICENSE
+[tag_url]: https://github.com/markpdfdown/markpdfdown/releases
+[license_url]: https://github.com/markpdfdown/markpdfdown/blob/main/LICENSE
 
 [Size]: https://img.shields.io/docker/image-size/jorbenzhu/markpdfdown/latest?color=066da5&label=size
 [Pulls]: https://img.shields.io/docker/pulls/jorbenzhu/markpdfdown.svg?style=flat&label=pulls&logo=docker
-[Tag]: https://img.shields.io/github/release/jorben/markpdfdown.svg
-[License]: https://img.shields.io/github/license/jorben/markpdfdown
+[Tag]: https://img.shields.io/github/release/markpdfdown/markpdfdown.svg
+[License]: https://img.shields.io/github/license/markpdfdown/markpdfdown
