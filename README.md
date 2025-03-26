@@ -51,20 +51,20 @@ export OPENAI_API_BASE=<your-api-base>
 # Optionally, set up your OpenAI API model
 export OPENAI_DEFAULT_MODEL=<your-model>
 
-# Run the application
+# pdf to markdown
 python main.py < tests/input.pdf > output.md
+
+# image to markdown
+python main.py < input_image.png > output.md
 ```
 ## Advanced Usage
 ```bash
 python main.py page_start page_end < tests/input.pdf > output.md
-
-# image to markdown
-python main.py < tests/input_image.png > output.md
 ```
 
 ## Docker Usage
 ```bash
-docker run -i -e OPENAI_API_KEY=<your-api-key> -e OPENAI_API_BASE=<your-api-base> -e OPENAI_DEFAULT_MODEL=<your-model> jorben/markpdfdown < tests/input.pdf > output.md
+docker run -i -e OPENAI_API_KEY=<your-api-key> -e OPENAI_API_BASE=<your-api-base> -e OPENAI_DEFAULT_MODEL=<your-model> jorbenzhu/markpdfdown < input.pdf > output.md
 ```
 
 ## Requirements
