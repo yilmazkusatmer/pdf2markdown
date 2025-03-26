@@ -51,22 +51,22 @@ export OPENAI_API_BASE=<你的API端点>
 # 可选设置默认模型
 export OPENAI_DEFAULT_MODEL=<你的模型>
 
-# 运行转换程序
-python main.py < tests/input.pdf > output.md
+# PDF转换Markdown
+python main.py < input.pdf > output.md
 
-# 图片转换
-python main.py < tests/input_image.png > output.md
+# 图片转换Markdown
+python main.py < input_image.png > output.md
 ```
 
 ## 高级用法
 ```bash
-# 转换指定页码范围
-python main.py 起始页码 结束页码 < tests/input.pdf > output.md
+# 转换指定页码范围（限PDF）
+python main.py 起始页码 结束页码 < input.pdf > output.md
 ```
 
 ## 在Docker中使用
 ```bash
-docker run -i -e OPENAI_API_KEY=<你的API密钥> -e OPENAI_API_BASE=<你的API端点> -e OPENAI_DEFAULT_MODEL=<你的模型> jorben/markpdfdown < tests/input.pdf > output.md
+docker run -i -e OPENAI_API_KEY=<你的API密钥> -e OPENAI_API_BASE=<你的API端点> -e OPENAI_DEFAULT_MODEL=<你的模型> jorbenzhu/markpdfdown < input.pdf > output.md
 ```
 
 ## 依赖环境
