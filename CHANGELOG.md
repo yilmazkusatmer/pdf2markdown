@@ -1,3 +1,9 @@
+# Version: 1.0.7
+
+* [#8](https://github.com/MarkPDFdown/markpdfdown/pull/8): fix: Fix the path spelling error in the Readme
+* [#11](https://github.com/MarkPDFdown/markpdfdown/pull/11): fix: Fix the OpenAI API 400 Bad Request issue #10
+
+
 ### Changelog
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
