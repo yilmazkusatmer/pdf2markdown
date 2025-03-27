@@ -51,7 +51,9 @@ class LLMClient:
                 base64_image = self.encode_image(img_path)
                 user_content.append({
                     "type": "image_url",
-                    "image_url": f"data:image/jpeg;base64,{base64_image}"
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{base64_image}"
+                    }
                 })
 
         messages = [
