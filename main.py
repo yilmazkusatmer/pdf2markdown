@@ -67,14 +67,22 @@ def convert_image_to_markdown(image_path):
     Returns:
         str: Converted Markdown string
     """
+    system_prompt = """
+You are a helpful assistant that can convert images to Markdown format. You are given an image, and you need to convert it to Markdown format. Please output the Markdown content only, without any other text.
+"""
     user_prompt = """
-Please read the content in the image and transcribe it into plain Markdown format. Please note:
-1. Maintain the format of headings, text, formulas, and table rows and columns
+Below is the image of one page of a document, please read the content in the image and transcribe it into plain Markdown format. Please note:
+1. Identify heading levels, text styles, formulas, and the format of table rows and columns
 2. Mathematical formulas should be transcribed using LaTeX syntax, ensuring consistency with the original
-3. No additional explanation is needed, and no content outside the original text should be added.
-    """
+3. Please output the Markdown content only, without any other text.
+
+Output Example:
+```markdown
+{example}
+```
+"""
     
-    response = completion(message=user_prompt, model="", image_paths=[image_path], temperature=0.3, max_tokens=8192)
+    response = completion(message=user_prompt, system_prompt=system_prompt, image_paths=[image_path], temperature=0.3, max_tokens=8192)
     response = remove_markdown_warp(response, "markdown")
     return response
 
