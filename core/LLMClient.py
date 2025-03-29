@@ -56,10 +56,16 @@ class LLMClient:
                     }
                 })
 
-        messages = [
-            {"role": "system", "content": system_prompt or ""},
-            {"role": "user", "content": user_content}
-        ]
+        messages = []
+        if system_prompt:
+            messages = [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_content}
+            ]
+        else:
+            messages = [
+                {"role": "user", "content": user_content}
+            ]
         
         try:
             response = None
