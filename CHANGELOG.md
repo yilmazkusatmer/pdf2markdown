@@ -1,3 +1,8 @@
+# Version: 1.0.8
+
+* [#15](https://github.com/MarkPDFdown/markpdfdown/pull/15): fix: Fixed the issue where hunyuan does not support empty system_prompt
+
+
 # Version: 1.0.7
 
 * [#8](https://github.com/MarkPDFdown/markpdfdown/pull/8): fix: Fix the path spelling error in the Readme
