@@ -44,7 +44,7 @@ class LLMClient:
         Returns:
             str: Model generated response content
         """
-        # 构造消息内容
+        # Create the message content
         user_content = [{"type": "text", "text": user_message}]
         if image_paths:
             for img_path in image_paths:
