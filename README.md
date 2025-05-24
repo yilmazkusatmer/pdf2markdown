@@ -30,6 +30,23 @@ MarkPDFDown is designed to simplify the process of converting PDF documents into
 
 ## Installation
 
+### Using uv (Recommended)
+
+```bash
+# Install uv if you haven't already
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Clone the repository
+git clone https://github.com/MarkPDFdown/markpdfdown.git
+cd markpdfdown
+
+# Install dependencies and create virtual environment
+uv sync
+
+```
+
+### Using conda
+
 ```bash
 conda create -n markpdfdown python=3.9
 conda activate markpdfdown
@@ -39,17 +56,16 @@ git clone https://github.com/MarkPDFdown/markpdfdown.git
 cd markpdfdown
 
 # Install dependencies
-pip install -r requirements.txt
-
+pip install -e .
 ```
 ## Usage
 ```bash
 # Set up your OpenAI API key
-export OPENAI_API_KEY=<your-api-key>
+export OPENAI_API_KEY="your-api-key"
 # Optionally, set up your OpenAI API base
-export OPENAI_API_BASE=<your-api-base>
+export OPENAI_API_BASE="your-api-base"
 # Optionally, set up your OpenAI API model
-export OPENAI_DEFAULT_MODEL=<your-model>
+export OPENAI_DEFAULT_MODEL="your-model"
 
 # pdf to markdown
 python main.py < tests/input.pdf > output.md
@@ -64,12 +80,52 @@ python main.py page_start page_end < tests/input.pdf > output.md
 
 ## Docker Usage
 ```bash
-docker run -i -e OPENAI_API_KEY=<your-api-key> -e OPENAI_API_BASE=<your-api-base> -e OPENAI_DEFAULT_MODEL=<your-model> jorbenzhu/markpdfdown < input.pdf > output.md
+docker run -i -e OPENAI_API_KEY=your-api-key -e OPENAI_API_BASE=your-api-base -e OPENAI_DEFAULT_MODEL=your-model jorbenzhu/markpdfdown < input.pdf > output.md
+```
+
+## Development Setup
+
+### Code Quality Tools
+
+This project uses `ruff` for linting and formatting, and `pre-commit` for automated code quality checks.
+
+#### Install development dependencies
+
+```bash
+# If using uv
+uv sync --group dev
+
+# If using pip
+pip install -e ".[dev]"
+```
+
+#### Set up pre-commit hooks
+
+```bash
+# Install pre-commit hooks
+pre-commit install
+
+# Run pre-commit on all files (optional)
+pre-commit run --all-files
+```
+
+#### Code formatting and linting
+
+```bash
+# Format code with ruff
+ruff format
+
+# Run linting checks
+ruff check
+
+# Fix auto-fixable issues
+ruff check --fix
 ```
 
 ## Requirements
 - Python 3.9+
-- Dependencies listed in `requirements.txt`
+- [uv](https://astral.sh/uv/) (recommended for package management) or conda/pip
+- Dependencies specified in `pyproject.toml`
 - Access to the specified multimodal AI model
 
 ## Contributing
@@ -77,9 +133,22 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 1. Fork the repository
 2. Create your feature branch ( `git checkout -b feature/amazing-feature` )
-3. Commit your changes ( `git commit -m 'feat: Add some amazing feature'` )
-4. Push to the branch ( `git push origin feature/amazing-feature` )
-5. Open a Pull Request
+3. Set up the development environment:
+   ```bash
+   uv sync --group dev
+   pre-commit install
+   ```
+4. Make your changes and ensure code quality:
+   ```bash
+   ruff format
+   ruff check --fix
+   pre-commit run --all-files
+   ```
+5. Commit your changes ( `git commit -m 'feat: Add some amazing feature'` )
+6. Push to the branch ( `git push origin feature/amazing-feature` )
+7. Open a Pull Request
+
+Please ensure your code follows the project's coding standards by running the linting and formatting tools before submitting.
 
 ## License
 This project is licensed under the Apache License 2.0. See the LICENSE file for details.

@@ -1,22 +1,30 @@
+import logging
 import os
+import shutil
 import sys
 import time
-import shutil
-import logging
+
 from core import LLMClient
 from core.FileWorker import create_worker
-from core.Util import *
+from core.Util import remove_markdown_warp
 
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(sys.stderr)
-    ]
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.StreamHandler(sys.stderr)],
 )
 logger = logging.getLogger(__name__)
 
-def completion(message, model="", system_prompt="", image_paths=None, temperature=0.5, max_tokens=8192, retry_times=3):
+
+def completion(
+    message,
+    model="",
+    system_prompt="",
+    image_paths=None,
+    temperature=0.5,
+    max_tokens=8192,
+    retry_times=3,
+):
     """
     Call OpenAI's completion interface for text generation
 
@@ -30,7 +38,7 @@ def completion(message, model="", system_prompt="", image_paths=None, temperatur
     Returns:
         str: Generated text content
     """
-    
+
     # Get API key and API base URL from environment variables
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
@@ -39,7 +47,7 @@ def completion(message, model="", system_prompt="", image_paths=None, temperatur
     base_url = os.getenv("OPENAI_API_BASE")
     if not base_url:
         base_url = "https://api.openai.com/v1/"
-    
+
     # If no model is specified, use the default model
     if not model:
         model = os.getenv("OPENAI_DEFAULT_MODEL")
@@ -51,13 +59,20 @@ def completion(message, model="", system_prompt="", image_paths=None, temperatur
     # Call completion method with retry mechanism
     for _ in range(retry_times):
         try:
-            response = client.completion(user_message=message, system_prompt=system_prompt, image_paths=image_paths, temperature=temperature, max_tokens=max_tokens)
+            response = client.completion(
+                user_message=message,
+                system_prompt=system_prompt,
+                image_paths=image_paths,
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
             return response
         except Exception as e:
             logger.error(f"LLM call failed: {str(e)}")
             # If retry fails, wait for a while before retrying
             time.sleep(0.5)
     return ""
+
 
 def convert_image_to_markdown(image_path):
     """
@@ -81,10 +96,17 @@ Output Example:
 {example}
 ```
 """
-    
-    response = completion(message=user_prompt, system_prompt=system_prompt, image_paths=[image_path], temperature=0.3, max_tokens=8192)
+
+    response = completion(
+        message=user_prompt,
+        system_prompt=system_prompt,
+        image_paths=[image_path],
+        temperature=0.3,
+        max_tokens=8192,
+    )
     response = remove_markdown_warp(response, "markdown")
     return response
+
 
 if __name__ == "__main__":
     start_page = 1
@@ -100,7 +122,9 @@ if __name__ == "__main__":
     input_data = sys.stdin.buffer.read()
     if not input_data:
         logger.error("No input data received")
-        logger.error("Usage: python main.py [start_page] [end_page] < path_to_input.pdf")
+        logger.error(
+            "Usage: python main.py [start_page] [end_page] < path_to_input.pdf"
+        )
         exit(1)
 
     # Create output directory
@@ -110,29 +134,29 @@ if __name__ == "__main__":
     # Try to get extension from file name
     input_filename = os.path.basename(sys.stdin.buffer.name)
     input_ext = os.path.splitext(input_filename)[1]
-    
+
     # If there is no extension or the file comes from standard input, try to determine the type by file content
-    if not input_ext or input_filename == '<stdin>':
+    if not input_ext or input_filename == "<stdin>":
         # PDF file magic number/signature is %PDF-
-        if input_data.startswith(b'%PDF-'):
-            input_ext = '.pdf'
+        if input_data.startswith(b"%PDF-"):
+            input_ext = ".pdf"
             logger.info("Recognized as PDF file by file content")
         # JPEG file magic number/signature is FF D8 FF DB
-        elif input_data.startswith(b'\xFF\xD8\xFF\xDB'):
-            input_ext = '.jpg'
+        elif input_data.startswith(b"\xff\xd8\xff\xdb"):
+            input_ext = ".jpg"
             logger.info("Recognized as JPEG file by file content")
         # PNG file magic number/signature is 89 50 4E 47
-        elif input_data.startswith(b'\x89\x50\x4E\x47'):
-            input_ext = '.png'
+        elif input_data.startswith(b"\x89\x50\x4e\x47"):
+            input_ext = ".png"
             logger.info("Recognized as PNG file by file content")
         # BMP file magic number/signature is 42 4D
-        elif input_data.startswith(b'\x42\x4D'):
-            input_ext = '.bmp'
+        elif input_data.startswith(b"\x42\x4d"):
+            input_ext = ".bmp"
             logger.info("Recognized as BMP file by file content")
         else:
             logger.error("Unsupported file type")
             exit(1)
-    
+
     input_path = os.path.join(output_dir, f"input{input_ext}")
     with open(input_path, "wb") as f:
         f.write(input_data)
@@ -143,7 +167,7 @@ if __name__ == "__main__":
     except ValueError as e:
         logger.error(str(e))
         exit(1)
-    
+
     # convert to images
     img_paths = worker.convert_to_images()
     logger.info("Image conversion completed")
@@ -161,4 +185,3 @@ if __name__ == "__main__":
     # Remote output path
     shutil.rmtree(output_dir)
     exit(0)
-    
