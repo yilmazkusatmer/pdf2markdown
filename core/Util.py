@@ -4,9 +4,7 @@ def remove_markdown_warp(text, language="markdown"):
     """
     text = text.strip()
     if text.startswith("```" + language):
-        text = text[len("```" + language):]
+        text = text[len("```" + language) :]
     if text.endswith("```"):
-        text = text[:-len("```")]
+        text = text[: -len("```")]
     return text.strip()
-
-

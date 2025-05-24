@@ -36,5 +36,3 @@ Table 3: Performance of aligned models with a scale of around 2B on benchmark. T
 Safety Evaluation   We also evaluate the safety score of CT-LLM-SFT-DPO compared with baselines such as MiniCPM-2B-sft-fp, Bloom-1.7B, and StableIm-zephyr-3B, etc on evalues responsibility benchmark (Xu et al., 2023). The evaluation consists of two parts: multiple-choice and question-answering. The multiple-choice part includes 1,712 input examples, each comprising a human query and two candidate responses. The evaluated models are
 
 7
-
-
