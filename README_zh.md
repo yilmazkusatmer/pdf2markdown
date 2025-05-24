@@ -61,11 +61,11 @@ pip install -e .
 ## 使用指南
 ```bash
 # 设置OpenAI API密钥
-export OPENAI_API_KEY=<你的API密钥>
+export OPENAI_API_KEY="你的API密钥"
 # 可选设置API端点
-export OPENAI_API_BASE=<你的API端点>
+export OPENAI_API_BASE="你的API端点"
 # 可选设置默认模型
-export OPENAI_DEFAULT_MODEL=<你的模型>
+export OPENAI_DEFAULT_MODEL="你的模型"
 
 # PDF转换Markdown
 python main.py < input.pdf > output.md
@@ -82,7 +82,7 @@ python main.py 起始页码 结束页码 < input.pdf > output.md
 
 ## 在Docker中使用
 ```bash
-docker run -i -e OPENAI_API_KEY=<你的API密钥> -e OPENAI_API_BASE=<你的API端点> -e OPENAI_DEFAULT_MODEL=<你的模型> jorbenzhu/markpdfdown < input.pdf > output.md
+docker run -i -e OPENAI_API_KEY=你的API密钥 -e OPENAI_API_BASE=你的API端点 -e OPENAI_DEFAULT_MODEL=你的模型 jorbenzhu/markpdfdown < input.pdf > output.md
 ```
 
 ## 开发环境设置
