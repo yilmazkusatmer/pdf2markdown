@@ -8,6 +8,7 @@ dependencies = [
     "openai==1.66.3",
     "pymupdf==1.25.3",
     "pypdf2==3.0.1",
+    "python-dotenv>=1.1.0",
 ]
 
 [dependency-groups]

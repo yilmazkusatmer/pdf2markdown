@@ -4,6 +4,8 @@ import shutil
 import sys
 import time
 
+from dotenv import load_dotenv
+
 from core import LLMClient
 from core.FileWorker import create_worker
 from core.Util import remove_markdown_warp
@@ -14,6 +16,8 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stderr)],
 )
 logger = logging.getLogger(__name__)
+
+load_dotenv()
 
 
 def completion(
@@ -143,8 +147,12 @@ if __name__ == "__main__":
             logger.info("Recognized as PDF file by file content")
         # JPEG file magic number/signature is FF D8 FF DB
         elif input_data.startswith(b"\xff\xd8\xff\xdb"):
-            input_ext = ".jpg"
+            input_ext = ".jpeg"
             logger.info("Recognized as JPEG file by file content")
+        # JPG file magic number/signature is FF D8 FF E0
+        elif input_data.startswith(b"\xff\xd8\xff\xe0"):
+            input_ext = ".jpg"
+            logger.info("Recognized as JPG file by file content")
         # PNG file magic number/signature is 89 50 4E 47
         elif input_data.startswith(b"\x89\x50\x4e\x47"):
             input_ext = ".png"
@@ -177,11 +185,19 @@ if __name__ == "__main__":
     for img_path in sorted(img_paths):
         img_path = img_path.replace("\\", "/")
         logger.info("Converting image %s to Markdown", img_path)
-        markdown += convert_image_to_markdown(img_path)
-        markdown += "\n\n"
-    logger.info("Image conversion to Markdown completed")
+        content = convert_image_to_markdown(img_path)
+        if content:
+            # 写入文件
+            with open(
+                os.path.join(output_dir, f"{os.path.basename(img_path)}.md"), "w"
+            ) as f:
+                f.write(content)
+            markdown += content
+            markdown += "\n\n"
+
     # Output Markdown
     print(markdown)
+    logger.info("Image conversion to Markdown completed")
     # Remote output path
     shutil.rmtree(output_dir)
     exit(0)
