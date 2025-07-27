@@ -184,3 +184,6 @@ cython_debug/
 # VSCode
 .vscode/
 .history/
+
+# DevContainers
+.devcontainer/
