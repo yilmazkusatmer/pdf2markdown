@@ -1,6 +1,7 @@
 # Core dependencies for PDF processing
 openai==1.66.3
 pymupdf==1.25.3
+PyPDF2>=3.0.0
 python-dotenv==1.1.0
 
 # Image processing
