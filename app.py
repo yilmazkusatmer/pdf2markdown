@@ -111,17 +111,11 @@ def configure_api_settings():
         help="Enter your OpenAI API key for processing"
     )
     
-    # API Base URL (optional)
-    api_base = st.text_input(
-        "API Base URL (Optional)",
-        value="https://api.openai.com/v1/",
-        help="Custom API base URL if using a different provider"
-    )
-    
     # Save to session state
     if api_key:
         st.session_state.openai_api_key = api_key
-        st.session_state.openai_api_base = api_base
+        # Use default OpenAI API base
+        st.session_state.openai_api_base = "https://api.openai.com/v1/"
         st.success("✅ API Key configured")
     else:
         st.warning("⚠️ Please enter your OpenAI API key")
