@@ -101,8 +101,6 @@ def main():
 
 def configure_api_settings():
     """Configure OpenAI API settings in sidebar"""
-    st.markdown('<div class="config-section">', unsafe_allow_html=True)
-    
     # API Key input
     api_key = st.text_input(
         "OpenAI API Key",
@@ -119,8 +117,6 @@ def configure_api_settings():
         st.success("✅ API Key configured")
     else:
         st.warning("⚠️ Please enter your OpenAI API key")
-    
-    st.markdown('</div>', unsafe_allow_html=True)
 
 def configure_page_options() -> Tuple[int, int]:
     """Configure page range options"""
