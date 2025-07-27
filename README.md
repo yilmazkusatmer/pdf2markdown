@@ -1,4 +1,4 @@
-# MarkPDFDown - Streamlit App
+# pdf2markdown - Streamlit App
 
 A clean, professional Streamlit application for converting PDF files to Markdown format using AI.
 

@@ -1,5 +1,5 @@
 """
-MarkPDFDown Streamlit Application
+pdf2markdown Streamlit Application
 
 A professional Streamlit interface for converting PDF files to Markdown format
 using multimodal large language models.
@@ -23,7 +23,7 @@ from markpdfdown_core import MarkPDFDownProcessor, ProcessingError
 def main():
     """Main Streamlit application function"""
     st.set_page_config(
-        page_title="MarkPDFDown - PDF to Markdown Converter",
+        page_title="pdf2markdown - PDF to Markdown Converter",
         page_icon="📄",
         layout="wide",
         initial_sidebar_state="expanded"
@@ -70,7 +70,7 @@ def main():
     # Main header
     st.markdown("""
     <div class="main-header">
-        <h1>📄 MarkPDFDown</h1>
+        <h1>📄 pdf2markdown</h1>
         <p>Convert PDF documents to clean Markdown format using AI</p>
     </div>
     """, unsafe_allow_html=True)

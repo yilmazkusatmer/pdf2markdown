@@ -1,5 +1,5 @@
 """
-MarkPDFDown Core Functionality
+pdf2markdown Core Functionality
 
 Refactored core functions from the original markpdfdown for Streamlit integration.
 This module provides a clean interface for PDF to Markdown conversion.
@@ -44,7 +44,7 @@ class MarkPDFDownProcessor:
         model: str = "gpt-4o-mini"
     ):
         """
-        Initialize the MarkPDFDown processor.
+        Initialize the pdf2markdown processor.
         
         Args:
             api_key: OpenAI API key
@@ -99,7 +99,7 @@ class MarkPDFDownProcessor:
             raise ProcessingError(f"PDF file not found: {pdf_path}")
         
         # Create temporary output directory
-        output_dir = tempfile.mkdtemp(prefix="markpdfdown_")
+        output_dir = tempfile.mkdtemp(prefix="pdf2markdown_")
         
         try:
             # Copy PDF to output directory for processing
