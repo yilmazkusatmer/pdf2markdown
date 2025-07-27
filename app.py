@@ -12,6 +12,13 @@ import time
 import base64
 from typing import Optional, Tuple
 import logging
+from dotenv import load_dotenv
+
+# Load environment variables
+import os
+current_dir = os.path.dirname(os.path.abspath(__file__))
+dotenv_path = os.path.join(current_dir, '.env')
+load_dotenv(dotenv_path, override=True)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -103,6 +110,8 @@ def configure_api_settings():
     """Configure OpenAI API settings in sidebar"""
     # Check for API key from environment (for local development)
     env_api_key = os.getenv('OPENAI_API_KEY')
+    
+
     
     # API Key input with fallback to environment
     api_key = st.text_input(
