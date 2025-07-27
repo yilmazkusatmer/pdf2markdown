@@ -217,13 +217,29 @@ You are a helpful assistant that can convert images to Markdown format. You are 
         
         user_prompt = """
 Below is the image of one page of a document, please read the content in the image and transcribe it into plain Markdown format. Please note:
-1. Identify heading levels, text styles, formulas, and the format of table rows and columns
-2. Mathematical formulas should be transcribed using LaTeX syntax, ensuring consistency with the original
-3. Please output the Markdown content only, without any other text.
+
+IMPORTANT RULES:
+1. DO NOT generate any image references like ![alt](url) or <img> tags
+2. If you see images, charts, or diagrams, describe them in text format instead
+3. Convert tables to proper Markdown table format with | symbols
+4. Identify heading levels, text styles, and formatting
+5. Mathematical formulas should be transcribed using LaTeX syntax ($ for inline, $$ for block)
+6. For images/charts, use descriptive text like: "**Chart Description:** [describe what you see]"
+7. Please output the Markdown content only, without any other text
 
 Output Example:
 ```markdown
-{example}
+# Document Title
+
+Regular paragraph text here.
+
+**Chart Description:** Bar chart showing sales data from 2020-2023, with increasing trend.
+
+| Column 1 | Column 2 | Column 3 |
+|----------|----------|----------|
+| Data 1   | Data 2   | Data 3   |
+
+Mathematical formula: $E = mc^2$
 ```
 """
         
