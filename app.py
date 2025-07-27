@@ -144,7 +144,7 @@ def configure_model_settings() -> dict:
     """Configure AI model settings"""
     model = st.selectbox(
         "AI Model",
-        options=["gpt-4o", "gpt-4o-mini", "gpt-4-vision-preview"],
+        options=["gpt-4o-mini", "gpt-4o", "gpt-4-vision-preview"],
         index=0,
         help="Select the AI model for processing"
     )

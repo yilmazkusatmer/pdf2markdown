@@ -41,7 +41,7 @@ class MarkPDFDownProcessor:
         self,
         api_key: str,
         api_base: str = "https://api.openai.com/v1/",
-        model: str = "gpt-4o"
+        model: str = "gpt-4o-mini"
     ):
         """
         Initialize the MarkPDFDown processor.
