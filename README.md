@@ -31,12 +31,12 @@ streamlit run streamlit_app.py
 
 ## 🔧 Configuration
 
-Set your OpenAI API key in the sidebar or use Streamlit secrets:
+**User-Provided API Keys**: Each user enters their own OpenAI API key through the sidebar interface. No API keys are stored or provided by the application.
 
-```toml
-# .streamlit/secrets.toml
-openai_api_key = "sk-..."
-```
+### For Users:
+1. Get your OpenAI API key from: https://platform.openai.com/api-keys
+2. Enter it in the sidebar when using the app
+3. Your key is only stored in your browser session
 
 ## 📄 License
 
