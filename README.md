@@ -6,8 +6,16 @@ A clean, professional Streamlit application for converting PDF files to Markdown
 
 ### Local Development
 ```bash
-pip install -r streamlit_requirements.txt
-streamlit run streamlit_app.py
+# Install dependencies
+pip install -r requirements.txt
+
+# Option 1: Set API key in .env file (recommended for development)
+cp .env.example .env
+# Edit .env and add your OpenAI API key
+
+# Option 2: Use the web interface to enter your API key
+# Run the app
+streamlit run app.py
 ```
 
 ### Streamlit Cloud Deployment

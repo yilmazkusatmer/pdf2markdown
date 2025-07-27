@@ -101,12 +101,16 @@ def main():
 
 def configure_api_settings():
     """Configure OpenAI API settings in sidebar"""
-    # API Key input
+    # Check for API key from environment (for local development)
+    env_api_key = os.getenv('OPENAI_API_KEY')
+    
+    # API Key input with fallback to environment
     api_key = st.text_input(
         "OpenAI API Key",
         type="password",
-        placeholder="sk-...",
-        help="Enter your OpenAI API key for processing"
+        value=env_api_key if env_api_key else "",
+        placeholder="sk-... (or set OPENAI_API_KEY in .env)",
+        help="Enter your OpenAI API key for processing. For local development, you can also set OPENAI_API_KEY in a .env file."
     )
     
     # Save to session state
@@ -114,9 +118,15 @@ def configure_api_settings():
         st.session_state.openai_api_key = api_key
         # Use default OpenAI API base
         st.session_state.openai_api_base = "https://api.openai.com/v1/"
-        st.success("✅ API Key configured")
+        if env_api_key and api_key == env_api_key:
+            st.success("✅ API Key loaded from .env file")
+        else:
+            st.success("✅ API Key configured")
     else:
-        st.warning("⚠️ Please enter your OpenAI API key")
+        if env_api_key:
+            st.info("💡 API Key found in .env - refresh to load")
+        else:
+            st.warning("⚠️ Please enter your OpenAI API key or set OPENAI_API_KEY in .env")
 
 def configure_page_options() -> Tuple[int, int]:
     """Configure page range options"""
@@ -142,11 +152,21 @@ def configure_page_options() -> Tuple[int, int]:
 
 def configure_model_settings() -> dict:
     """Configure AI model settings"""
+    # Check for default model from environment
+    env_model = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
+    
+    # Find index of environment model in options
+    model_options = ["gpt-4o-mini", "gpt-4o", "gpt-4-vision-preview"]
+    try:
+        default_index = model_options.index(env_model)
+    except ValueError:
+        default_index = 0  # fallback to gpt-4o-mini
+    
     model = st.selectbox(
         "AI Model",
-        options=["gpt-4o-mini", "gpt-4o", "gpt-4-vision-preview"],
-        index=0,
-        help="Select the AI model for processing"
+        options=model_options,
+        index=default_index,
+        help="Select the AI model for processing. Default can be set with OPENAI_MODEL in .env"
     )
     
     temperature = st.slider(
