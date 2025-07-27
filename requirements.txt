@@ -1,0 +1,13 @@
+# Core dependencies for PDF processing
+openai==1.66.3
+pymupdf==1.25.3
+python-dotenv==1.1.0
+
+# Image processing
+pillow>=10.0.0
+
+# Streamlit (automatically installed by Streamlit.io)
+streamlit>=1.29.0
+
+# Optional: Remove testing dependencies for production
+# pytest>=7.0.0

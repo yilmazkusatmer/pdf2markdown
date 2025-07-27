@@ -176,3 +176,11 @@ cython_debug/
 
 # MacOS ds_store files
 .DS_Store
+
+# Streamlit secrets (contains API keys)
+.streamlit/secrets.toml
+
+
+# VSCode
+.vscode/
+.history/
