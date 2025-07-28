@@ -41,30 +41,41 @@ class PdfToMarkdownProcessor:
         self,
         api_key: str,
         api_base: str = "https://api.openai.com/v1/",
-        model: str = "gpt-4o-mini"
+        model: str = "gpt-4o-mini",
+        provider: str = "openai"
     ):
         """
         Initialize the pdf2markdown processor.
         
         Args:
-            api_key: OpenAI API key
-            api_base: OpenAI API base URL
+            api_key: API key (OpenAI key or "ollama" for local usage)
+            api_base: API base URL 
             model: Model name to use for processing
+            provider: Provider type ("openai" or "ollama")
         """
         self.api_key = api_key
         self.api_base = api_base
         self.model = model
+        self.provider = provider.lower()
         
-        # Validate API key
-        if not api_key:
+        # Validate API key for OpenAI
+        if self.provider == "openai" and not api_key:
             raise ProcessingError("OpenAI API key is required")
+        elif self.provider == "ollama" and not api_key:
+            # For Ollama, use default dummy key
+            self.api_key = "ollama"
+        
+        # Check if Ollama model supports vision
+        if self.provider == "ollama":
+            self._validate_ollama_vision_support()
         
         # Initialize LLM client
         try:
             self.llm_client = LLMClient(
                 base_url=api_base,
-                api_key=api_key,
-                model=model
+                api_key=self.api_key,
+                model=model,
+                provider=self.provider
             )
         except Exception as e:
             raise ProcessingError(f"Failed to initialize LLM client: {str(e)}")
@@ -211,11 +222,33 @@ class PdfToMarkdownProcessor:
         Returns:
             str: Generated Markdown content
         """
-        system_prompt = """
+        # Use provider-specific prompts for better results
+        if self.provider == "ollama":
+            system_prompt = """
+You are a document transcriber. Your job is to read text from images and transcribe it EXACTLY as shown. Do not add, change, or invent any content. Only transcribe what you actually see in the image.
+"""
+            
+            user_prompt = """
+TRANSCRIBE the text you see in this image to Markdown format.
+
+CRITICAL RULES:
+- ONLY transcribe text that is ACTUALLY VISIBLE in the image
+- DO NOT invent, add, or change any content
+- DO NOT create fictional data, dates, names, or numbers
+- If you see a chart/diagram, write: **Chart Description:** [what you actually see]
+- Use exact text from the image
+- Format as Markdown: # for titles, ## for headings, **bold**, *italic*
+- For tables, use | column | format only if you see an actual table
+- STOP when you have transcribed everything visible
+
+Transcribe exactly what you see:"""
+        else:
+            # OpenAI-optimized prompt
+            system_prompt = """
 You are a helpful assistant that can convert images to Markdown format. You are given an image, and you need to convert it to Markdown format. Please output the Markdown content only, without any other text.
 """
-        
-        user_prompt = """
+            
+            user_prompt = """
 Below is the image of one page of a document, please read the content in the image and transcribe it into plain Markdown format. Please note:
 
 IMPORTANT RULES:
@@ -246,17 +279,27 @@ Mathematical formula: $E = mc^2$
         # Attempt conversion with retry logic
         for attempt in range(retry_times):
             try:
+                # Use lower temperature for Ollama to reduce hallucinations
+                actual_temperature = 0.1 if self.provider == "ollama" else temperature
+                # Use shorter max_tokens for Ollama to prevent rambling
+                actual_max_tokens = min(max_tokens, 2048) if self.provider == "ollama" else max_tokens
+                
                 response = self.llm_client.completion(
                     user_message=user_prompt,
                     system_prompt=system_prompt,
                     image_paths=[img_path],
-                    temperature=temperature,
-                    max_tokens=max_tokens,
+                    temperature=actual_temperature,
+                    max_tokens=actual_max_tokens,
                 )
                 
                 if response:
                     # Remove markdown code block wrappers if present
                     cleaned_response = remove_markdown_warp(response, "markdown")
+                    
+                    # Additional cleanup for Ollama models
+                    if self.provider == "ollama":
+                        cleaned_response = self._clean_ollama_output(cleaned_response)
+                    
                     return cleaned_response
                 else:
                     logger.warning(f"Empty response for image {img_path}, attempt {attempt + 1}")
@@ -269,6 +312,75 @@ Mathematical formula: $E = mc^2$
         # This should never be reached due to the logic above, but just in case
         raise ProcessingError(f"Failed to convert image after {retry_times} attempts")
 
+    def _clean_ollama_output(self, content: str) -> str:
+        """
+        Clean up common Ollama output issues like duplicated content
+        """
+        if not content:
+            return content
+            
+        lines = content.split('\n')
+        cleaned_lines = []
+        seen_lines = set()
+        
+        for line in lines:
+            # Remove excessive whitespace
+            line = line.strip()
+            
+            # Skip empty lines that are too frequent
+            if not line:
+                if not cleaned_lines or cleaned_lines[-1]:  # Only add if previous line wasn't empty
+                    cleaned_lines.append(line)
+                continue
+            
+            # Skip exact duplicates (case-insensitive for headings)
+            line_lower = line.lower()
+            if line_lower not in seen_lines:
+                seen_lines.add(line_lower)
+                cleaned_lines.append(line)
+        
+        # Remove common Ollama artifacts
+        result = '\n'.join(cleaned_lines)
+        
+        # Remove duplicate sections (simple heuristic)
+        paragraphs = result.split('\n\n')
+        unique_paragraphs = []
+        seen_paragraphs = set()
+        
+        for para in paragraphs:
+            para = para.strip()
+            if para and para.lower() not in seen_paragraphs:
+                seen_paragraphs.add(para.lower())
+                unique_paragraphs.append(para)
+        
+        return '\n\n'.join(unique_paragraphs).strip()
+
+    def _validate_ollama_vision_support(self):
+        """
+        Check if the selected Ollama model supports vision capabilities
+        """
+        # List of known vision-capable Ollama models
+        vision_models = {
+            'llava', 'llava:latest', 'llava:7b', 'llava:13b', 'llava:34b',
+            'llava-llama3', 'llava-phi3', 'llava-v1.6',
+            'bakllava', 'moondream', 'cogvlm',
+            'gemma3:4b', 'gemma3:12b', 'gemma3:27b',  # Some Gemma3 variants support vision
+            'qwen2-vl', 'minicpm-v', 'internvl'
+        }
+        
+        model_name = self.model.lower()
+        
+        # Check if model name contains any vision-capable keywords
+        is_vision_capable = any(
+            vision_model in model_name for vision_model in vision_models
+        )
+        
+        if not is_vision_capable:
+            logger.warning(f"⚠️  Model '{self.model}' may not support vision capabilities!")
+            logger.warning("💡 Consider using a vision-capable model like 'llava:latest' or 'gemma3:4b'")
+            
+            # Don't raise error, just warn - let user decide
+            
     def validate_api_connection(self) -> bool:
         """
         Validate the API connection by making a simple test call.

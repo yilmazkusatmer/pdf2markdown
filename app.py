@@ -13,9 +13,11 @@ import base64
 from typing import Optional, Tuple
 import logging
 from dotenv import load_dotenv
+import os
+import requests
+import json
 
 # Load environment variables
-import os
 current_dir = os.path.dirname(os.path.abspath(__file__))
 dotenv_path = os.path.join(current_dir, '.env')
 load_dotenv(dotenv_path, override=True)
@@ -24,8 +26,134 @@ load_dotenv(dotenv_path, override=True)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Import markpdfdown core functionality
+# Import the core processing class
 from pdf2markdown_core import PdfToMarkdownProcessor, ProcessingError
+
+def get_ollama_models():
+    """
+    Dynamically fetch available Ollama models from local instance
+    """
+    try:
+        # Try to connect to Ollama API
+        ollama_base_url = os.getenv('OLLAMA_BASE_URL', 'http://localhost:11434')
+        response = requests.get(f"{ollama_base_url.rstrip('/v1')}/api/tags", timeout=5)
+        
+        if response.status_code == 200:
+            data = response.json()
+            models = []
+            if 'models' in data:
+                for model in data['models']:
+                    model_name = model.get('name', '')
+                    if model_name:
+                        models.append(model_name)
+                
+                # Sort models for better UX
+                models.sort()
+                
+                if models:
+                    return models
+                    
+    except Exception as e:
+        logger.warning(f"Could not fetch Ollama models: {e}")
+        
+    # Fallback to common models if API call fails (vision-capable models first)
+    fallback_models = [
+        "llava:latest",
+        "llava:7b", 
+        "gemma3:4b",
+        "gemma3:12b", 
+        "gemma3:27b",
+        "mistral:latest",
+        "qwen2.5:latest",
+        "llama3.1:latest",
+        "codellama:latest"
+    ]
+    
+    return fallback_models
+
+def configure_model_settings():
+    """Configure model settings based on selected AI provider"""
+    provider = st.session_state.get('ai_provider', 'openai')
+    
+    if provider == "openai":
+        # OpenAI models
+        openai_models = [
+            "gpt-4o-mini",
+            "gpt-4o", 
+            "gpt-4-vision-preview"
+        ]
+        
+        env_model = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
+        default_index = 0
+        if env_model in openai_models:
+            default_index = openai_models.index(env_model)
+        
+        model = st.selectbox(
+            "🤖 Model",
+            options=openai_models,
+            index=default_index,
+            help="Choose the OpenAI model for processing"
+        )
+        
+    else:
+        # Ollama models - fetch dynamically
+        with st.spinner("🔍 Fetching available Ollama models..."):
+            ollama_models = get_ollama_models()
+        
+        if not ollama_models:
+            st.warning("⚠️ No Ollama models found. Please ensure Ollama is running and has models installed.")
+            st.info("💡 For PDF processing, install a vision-capable model:")
+            st.markdown("**🔥 Recommended for best results:**")
+            st.code("ollama pull llava:latest", language="bash")
+            st.code("ollama pull llava:7b", language="bash")
+            st.markdown("**Alternative models:**")
+            st.code("ollama pull gemma3:4b", language="bash") 
+            model = "llava:latest"  # better fallback for vision
+        else:
+            env_model = os.getenv('OLLAMA_MODEL', ollama_models[0] if ollama_models else 'mistral:latest')
+            default_index = 0
+            
+            # Try to find the environment model in the list
+            if env_model in ollama_models:
+                default_index = ollama_models.index(env_model)
+            
+            model = st.selectbox(
+                "🤖 Model", 
+                options=ollama_models,
+                index=default_index,
+                help="Choose your locally installed Ollama model"
+            )
+            
+            # Show model info
+            if ollama_models:
+                st.info(f"📊 Found {len(ollama_models)} available models")
+                
+                # Check if selected model supports vision
+                vision_models = ['llava', 'gemma3', 'qwen2-vl', 'minicpm-v', 'bakllava', 'moondream']
+                is_vision_model = any(vm in model.lower() for vm in vision_models)
+                
+                if not is_vision_model:
+                    st.warning("⚠️ Selected model may not support vision! PDF processing might fail.")
+                    st.info("💡 **Best models**: llava:latest, llava:7b | **Good**: gemma3:4b")
+                else:
+                    st.success("✅ Vision-capable model selected")
+                    # Extra encouragement for llava models
+                    if 'llava' in model.lower():
+                        st.info("🔥 **llava models are excellent for PDF processing!**")
+                
+                # Option to add custom model
+                custom_model = st.text_input(
+                    "Or enter custom model name:",
+                    placeholder="e.g., llava:latest",
+                    help="Enter a model name if it's not in the list above (preferably vision-capable)"
+                )
+                
+                if custom_model.strip():
+                    model = custom_model.strip()
+    
+    # Store in session state
+    st.session_state.selected_model = model
+    return model
 
 def main():
     """Main Streamlit application function"""
@@ -92,7 +220,33 @@ def main():
         page_range = configure_page_options()
         
         st.subheader("Model Settings")
-        model_config = configure_model_settings()
+        selected_model = configure_model_settings()
+        
+        # Additional model parameters
+        temperature = st.slider(
+            "Temperature",
+            min_value=0.0,
+            max_value=1.0,
+            value=0.3,
+            step=0.1,
+            help="Controls randomness in AI responses"
+        )
+        
+        max_tokens = st.slider(
+            "Max Tokens",
+            min_value=1000,
+            max_value=8192,
+            value=8192,
+            step=256,
+            help="Maximum tokens for AI response"
+        )
+        
+        # Create model config dictionary for compatibility
+        model_config = {
+            "model": selected_model,
+            "temperature": temperature,
+            "max_tokens": max_tokens
+        }
     
     # Main content area - vertical layout
     st.header("📤 Upload PDF")
@@ -107,35 +261,57 @@ def main():
     display_markdown_output()
 
 def configure_api_settings():
-    """Configure OpenAI API settings in sidebar"""
-    # Check for API key from environment (for local development)
-    env_api_key = os.getenv('OPENAI_API_KEY')
-    
-
-    
-    # API Key input with fallback to environment
-    api_key = st.text_input(
-        "OpenAI API Key",
-        type="password",
-        value=env_api_key if env_api_key else "",
-        placeholder="sk-... (or set OPENAI_API_KEY in .env)",
-        help="Enter your OpenAI API key for processing. For local development, you can also set OPENAI_API_KEY in a .env file."
+    """Configure LLM API settings in sidebar"""
+    # Provider selection
+    provider = st.selectbox(
+        "🤖 AI Provider",
+        options=["OpenAI", "Ollama (Local)"],
+        index=0,
+        help="Choose between OpenAI (cloud) or Ollama (local) for AI processing"
     )
     
-    # Save to session state
-    if api_key:
-        st.session_state.openai_api_key = api_key
-        # Use default OpenAI API base
+    provider_key = "openai" if provider.startswith("OpenAI") else "ollama"
+    st.session_state.ai_provider = provider_key
+    
+    if provider_key == "openai":
+        # OpenAI Configuration
+        env_api_key = os.getenv('OPENAI_API_KEY')
+        
+        api_key = st.text_input(
+            "OpenAI API Key",
+            type="password",
+            value=env_api_key if env_api_key else "",
+            placeholder="sk-... (or set OPENAI_API_KEY in .env)",
+            help="Enter your OpenAI API key for processing. For local development, you can also set OPENAI_API_KEY in a .env file."
+        )
+        
         st.session_state.openai_api_base = "https://api.openai.com/v1/"
-        if env_api_key and api_key == env_api_key:
-            st.success("✅ API Key loaded from .env file")
+        
+        if api_key:
+            st.session_state.openai_api_key = api_key
+            if env_api_key and api_key == env_api_key:
+                st.success("✅ OpenAI API Key loaded from .env file")
+            else:
+                st.success("✅ OpenAI API Key configured")
         else:
-            st.success("✅ API Key configured")
+            if env_api_key:
+                st.info("💡 API Key found in .env - refresh to load")
+            else:
+                st.warning("⚠️ Please enter your OpenAI API key")
+                
     else:
-        if env_api_key:
-            st.info("💡 API Key found in .env - refresh to load")
-        else:
-            st.warning("⚠️ Please enter your OpenAI API key or set OPENAI_API_KEY in .env")
+        # Ollama Configuration
+        ollama_base_url = st.text_input(
+            "Ollama Base URL",
+            value=os.getenv('OLLAMA_BASE_URL', 'http://localhost:11434/v1'),
+            placeholder="http://localhost:11434/v1",
+            help="Base URL for your local Ollama instance"
+        )
+        
+        st.session_state.openai_api_key = "ollama"
+        st.session_state.openai_api_base = ollama_base_url
+        st.success("✅ Ollama configured for local AI processing")
+        st.info("💡 Make sure Ollama is running locally and your model is available")
 
 def configure_page_options() -> Tuple[int, int]:
     """Configure page range options"""
@@ -158,49 +334,6 @@ def configure_page_options() -> Tuple[int, int]:
         )
     
     return start_page, end_page
-
-def configure_model_settings() -> dict:
-    """Configure AI model settings"""
-    # Check for default model from environment
-    env_model = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
-    
-    # Find index of environment model in options
-    model_options = ["gpt-4o-mini", "gpt-4o", "gpt-4-vision-preview"]
-    try:
-        default_index = model_options.index(env_model)
-    except ValueError:
-        default_index = 0  # fallback to gpt-4o-mini
-    
-    model = st.selectbox(
-        "AI Model",
-        options=model_options,
-        index=default_index,
-        help="Select the AI model for processing. Default can be set with OPENAI_MODEL in .env"
-    )
-    
-    temperature = st.slider(
-        "Temperature",
-        min_value=0.0,
-        max_value=1.0,
-        value=0.3,
-        step=0.1,
-        help="Controls randomness in AI responses"
-    )
-    
-    max_tokens = st.slider(
-        "Max Tokens",
-        min_value=1000,
-        max_value=8192,
-        value=8192,
-        step=256,
-        help="Maximum tokens for AI response"
-    )
-    
-    return {
-        "model": model,
-        "temperature": temperature,
-        "max_tokens": max_tokens
-    }
 
 def handle_file_upload() -> Tuple[Optional[any], bool]:
     """Handle PDF file upload"""
@@ -241,10 +374,12 @@ def process_pdf_file(uploaded_file, page_range: Tuple[int, int], model_config: d
         )
         progress_bar.progress(10)
         
+        provider = getattr(st.session_state, 'ai_provider', 'openai')
         processor = PdfToMarkdownProcessor(
             api_key=st.session_state.openai_api_key,
             api_base=getattr(st.session_state, 'openai_api_base', 'https://api.openai.com/v1/'),
-            model=model_config["model"]
+            model=model_config["model"],
+            provider=provider
         )
         
         # Save uploaded file temporarily

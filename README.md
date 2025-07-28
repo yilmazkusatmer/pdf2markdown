@@ -1,33 +1,59 @@
 # pdf2markdown - Streamlit App
 
-A clean, professional Streamlit application for converting PDF files to Markdown format using AI.
+A clean, professional Streamlit application for converting PDF files to Markdown format using AI. Supports both **OpenAI** (cloud) and **Ollama** (local) for maximum flexibility.
 
 ## 🚀 Quick Start
 
-### Local Development
+### Option 1: OpenAI (Cloud)
 ```bash
 # Install dependencies
 pip install -r requirements.txt
 
-# Option 1: Set API key in .env file (recommended for development)
+# Set up OpenAI configuration
 cp .env.example .env
 # Edit .env and add your OpenAI API key
 
-# Option 2: Use the web interface to enter your API key
 # Run the app
 streamlit run app.py
+```
+
+### Option 2: Ollama (Local & Private)
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Install and start Ollama
+curl -fsSL https://ollama.ai/install.sh | sh
+ollama pull llava:latest  # Recommended for PDF processing
+# Alternative: ollama pull llava:7b
+
+# Configure environment (optional)
+cp .env.example .env
+# Edit .env: set OLLAMA_BASE_URL and OLLAMA_MODEL
+
+# Run the app
+streamlit run app.py
+# Select "Ollama (Local)" in the AI Provider dropdown
 ```
 
 ### Streamlit Cloud Deployment
 1. Upload this repository to GitHub
 2. Connect to Streamlit Cloud
-3. Deploy with main file: `streamlit_app.py`
+3. Deploy with main file: `app.py`
+
+## 🤖 AI Provider Options
+
+| Provider | Type | Privacy | Cost | Setup Complexity |
+|----------|------|---------|------|------------------|
+| **OpenAI** | Cloud | Low | Pay per use | Easy |
+| **Ollama** | Local | High | Free | Medium |
 
 ## 📋 Requirements
 
-- Python 3.8+
-- OpenAI API key for AI processing
-- Dependencies listed in `streamlit_requirements.txt`
+- Python 3.9+
+- **For OpenAI**: API key from https://platform.openai.com/api-keys
+- **For Ollama**: Local Ollama installation
+- Dependencies listed in `requirements.txt`
 
 ## 🎯 Features
 

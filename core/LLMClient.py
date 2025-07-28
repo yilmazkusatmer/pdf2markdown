@@ -8,20 +8,29 @@ logger = logging.getLogger(__name__)
 
 class LLMClient:
     """
-    OpenAI API compatible client class
+    OpenAI API compatible client class supporting both OpenAI and Ollama
     """
 
-    def __init__(self, base_url: str, api_key: str, model: str):
+    def __init__(self, base_url: str, api_key: str, model: str, provider: str = "openai"):
         """
-        Initialize OpenAI API client
-        :param base_url: Base URL for OpenAI API
-        :param api_key: OpenAI API key
+        Initialize LLM API client
+        :param base_url: Base URL for API
+        :param api_key: API key (use "ollama" for Ollama)
         :param model: Name of the model to use
+        :param provider: Provider type ("openai" or "ollama")
         """
         self.base_url = base_url
         self.api_key = api_key
         self.model = model
-        self.client = openai.OpenAI(base_url=base_url, api_key=api_key)
+        self.provider = provider.lower()
+        
+        # For Ollama, we use a dummy API key but still use OpenAI client format
+        client_api_key = api_key if self.provider == "openai" else "ollama"
+        self.client = openai.OpenAI(base_url=base_url, api_key=client_api_key)
+        
+    def is_ollama(self) -> bool:
+        """Check if this client is configured for Ollama"""
+        return self.provider == "ollama"
 
     def completion(
         self,
@@ -66,15 +75,21 @@ class LLMClient:
             messages = [{"role": "user", "content": user_content}]
 
         try:
+            # Set headers based on provider
+            headers = {}
+            if self.provider == "openai":
+                headers = {
+                    "X-Title": "pdf2markdown",
+                    "HTTP-Referer": "https://github.com/yilmazkusatmer/pdf2markdown.git",
+                }
+            # Ollama doesn't need custom headers
+            
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
                 temperature=temperature,
                 max_tokens=max_tokens,
-                extra_headers={
-                    "X-Title": "pdf2markdown",
-                    "HTTP-Referer": "https://github.com/yilmazkusatmer/pdf2markdown.git",
-                },
+                extra_headers=headers,
             )
             return response.choices[0].message.content
 
