@@ -58,6 +58,7 @@ def get_ollama_models():
         
     # Fallback to common models if API call fails (vision-capable models first)
     fallback_models = [
+        "minicpm-v:latest",  # Best for text accuracy
         "llava:latest",
         "llava:7b", 
         "gemma3:4b",
@@ -79,8 +80,7 @@ def configure_model_settings():
         # OpenAI models
         openai_models = [
             "gpt-4o-mini",
-            "gpt-4o", 
-            "gpt-4-vision-preview"
+            "gpt-4o"
         ]
         
         env_model = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
@@ -103,11 +103,12 @@ def configure_model_settings():
         if not ollama_models:
             st.warning("⚠️ No Ollama models found. Please ensure Ollama is running and has models installed.")
             st.info("💡 For PDF processing, install a vision-capable model:")
-            st.markdown("**🔥 Recommended for best results:**")
+            st.markdown("**🔥 Recommended for best text accuracy:**")
+            st.code("ollama pull minicpm-v:latest", language="bash")
+            st.info("⏱️ minicpm-v: Slower but more accurate")
+            st.markdown("**Alternative vision models (faster):**")
             st.code("ollama pull llava:latest", language="bash")
-            st.code("ollama pull llava:7b", language="bash")
-            st.markdown("**Alternative models:**")
-            st.code("ollama pull gemma3:4b", language="bash") 
+            st.code("ollama pull llava:7b", language="bash") 
             model = "llava:latest"  # better fallback for vision
         else:
             env_model = os.getenv('OLLAMA_MODEL', ollama_models[0] if ollama_models else 'mistral:latest')
@@ -134,12 +135,15 @@ def configure_model_settings():
                 
                 if not is_vision_model:
                     st.warning("⚠️ Selected model may not support vision! PDF processing might fail.")
-                    st.info("💡 **Best models**: llava:latest, llava:7b | **Good**: gemma3:4b")
+                    st.info("💡 **Best model**: minicpm-v:latest | **Alternative**: llava:latest, llava:7b")
                 else:
                     st.success("✅ Vision-capable model selected")
-                    # Extra encouragement for llava models
-                    if 'llava' in model.lower():
-                        st.info("🔥 **llava models are excellent for PDF processing!**")
+                    # Extra encouragement for minicpm-v models
+                    if 'minicpm-v' in model.lower():
+                        st.info("🔥 **minicpm-v models have excellent text accuracy for PDF processing!**")
+                        st.warning("⏱️ **Note:** minicpm-v is slower but more accurate than llava models")
+                    elif 'llava' in model.lower():
+                        st.info("✅ **llava models are good for PDF processing**")
                 
                 # Option to add custom model
                 custom_model = st.text_input(
@@ -223,14 +227,6 @@ def main():
         selected_model = configure_model_settings()
         
         # Additional model parameters
-        temperature = st.slider(
-            "Temperature",
-            min_value=0.0,
-            max_value=1.0,
-            value=0.3,
-            step=0.1,
-            help="Controls randomness in AI responses"
-        )
         
         max_tokens = st.slider(
             "Max Tokens",
@@ -244,7 +240,6 @@ def main():
         # Create model config dictionary for compatibility
         model_config = {
             "model": selected_model,
-            "temperature": temperature,
             "max_tokens": max_tokens
         }
     
@@ -312,6 +307,10 @@ def configure_api_settings():
         st.session_state.openai_api_base = ollama_base_url
         st.success("✅ Ollama configured for local AI processing")
         st.info("💡 Make sure Ollama is running locally and your model is available")
+        
+        # Info about Ollama quality
+        st.info("💡 **For best results:** Use OpenAI GPT-4 Vision or minicpm-v:latest (Ollama)")
+        st.warning("⚠️ **Note:** Some Ollama models may be less accurate than OpenAI")
 
 def configure_page_options() -> Tuple[int, int]:
     """Configure page range options"""
@@ -404,7 +403,6 @@ def process_pdf_file(uploaded_file, page_range: Tuple[int, int], model_config: d
             pdf_path=tmp_path,
             start_page=start_page,
             end_page=end_page,
-            temperature=model_config["temperature"],
             max_tokens=model_config["max_tokens"]
         )
         

@@ -85,7 +85,6 @@ class PdfToMarkdownProcessor:
         pdf_path: str,
         start_page: int = 1,
         end_page: int = 0,
-        temperature: float = 0.3,
         max_tokens: int = 8192,
         dpi: int = 300
     ) -> str:
@@ -139,7 +138,6 @@ class PdfToMarkdownProcessor:
                 try:
                     content = self._convert_image_to_markdown(
                         img_path=img_path,
-                        temperature=temperature,
                         max_tokens=max_tokens
                     )
                     
@@ -174,7 +172,6 @@ class PdfToMarkdownProcessor:
     def convert_image_to_markdown(
         self,
         image_path: str,
-        temperature: float = 0.3,
         max_tokens: int = 8192
     ) -> str:
         """
@@ -197,7 +194,6 @@ class PdfToMarkdownProcessor:
         try:
             return self._convert_image_to_markdown(
                 img_path=image_path,
-                temperature=temperature,
                 max_tokens=max_tokens
             )
         except Exception as e:
@@ -206,7 +202,6 @@ class PdfToMarkdownProcessor:
     def _convert_image_to_markdown(
         self,
         img_path: str,
-        temperature: float = 0.3,
         max_tokens: int = 8192,
         retry_times: int = 3
     ) -> str:
@@ -229,19 +224,17 @@ You are a document transcriber. Your job is to read text from images and transcr
 """
             
             user_prompt = """
-TRANSCRIBE the text you see in this image to Markdown format.
+Read the text in this image and format it as Markdown.
 
-CRITICAL RULES:
-- ONLY transcribe text that is ACTUALLY VISIBLE in the image
-- DO NOT invent, add, or change any content
-- DO NOT create fictional data, dates, names, or numbers
-- If you see a chart/diagram, write: **Chart Description:** [what you actually see]
-- Use exact text from the image
-- Format as Markdown: # for titles, ## for headings, **bold**, *italic*
-- For tables, use | column | format only if you see an actual table
-- STOP when you have transcribed everything visible
+Rules:
+- Only write what you actually see
+- Use # for big titles
+- Use ## for section headers  
+- Use **text** for bold
+- Use | tables | like | this |
+- Don't make up any information
 
-Transcribe exactly what you see:"""
+Start transcribing:"""
         else:
             # OpenAI-optimized prompt
             system_prompt = """
@@ -279,8 +272,8 @@ Mathematical formula: $E = mc^2$
         # Attempt conversion with retry logic
         for attempt in range(retry_times):
             try:
-                # Use lower temperature for Ollama to reduce hallucinations
-                actual_temperature = 0.1 if self.provider == "ollama" else temperature
+                # Use zero temperature for deterministic text extraction
+                actual_temperature = 0.0  # No creativity needed for PDF transcription
                 # Use shorter max_tokens for Ollama to prevent rambling
                 actual_max_tokens = min(max_tokens, 2048) if self.provider == "ollama" else max_tokens
                 
@@ -359,27 +352,8 @@ Mathematical formula: $E = mc^2$
         """
         Check if the selected Ollama model supports vision capabilities
         """
-        # List of known vision-capable Ollama models
-        vision_models = {
-            'llava', 'llava:latest', 'llava:7b', 'llava:13b', 'llava:34b',
-            'llava-llama3', 'llava-phi3', 'llava-v1.6',
-            'bakllava', 'moondream', 'cogvlm',
-            'gemma3:4b', 'gemma3:12b', 'gemma3:27b',  # Some Gemma3 variants support vision
-            'qwen2-vl', 'minicpm-v', 'internvl'
-        }
-        
-        model_name = self.model.lower()
-        
-        # Check if model name contains any vision-capable keywords
-        is_vision_capable = any(
-            vision_model in model_name for vision_model in vision_models
-        )
-        
-        if not is_vision_capable:
-            logger.warning(f"⚠️  Model '{self.model}' may not support vision capabilities!")
-            logger.warning("💡 Consider using a vision-capable model like 'llava:latest' or 'gemma3:4b'")
-            
-            # Don't raise error, just warn - let user decide
+        # No hardcoded lists - user knows best which model they want to use
+        logger.info(f"Using Ollama model '{self.model}' for vision processing")
             
     def validate_api_connection(self) -> bool:
         """
