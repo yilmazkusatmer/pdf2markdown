@@ -102,13 +102,9 @@ def configure_model_settings():
         
         if not ollama_models:
             st.warning("⚠️ No Ollama models found. Please ensure Ollama is running and has models installed.")
-            st.info("💡 For PDF processing, install a vision-capable model:")
-            st.markdown("**🔥 Recommended for best text accuracy:**")
+            st.info("💡 Install a vision model:")
             st.code("ollama pull minicpm-v:latest", language="bash")
-            st.info("⏱️ minicpm-v: Slower but more accurate")
-            st.markdown("**Alternative vision models (faster):**")
-            st.code("ollama pull llava:latest", language="bash")
-            st.code("ollama pull llava:7b", language="bash") 
+            st.code("ollama pull llava:latest", language="bash") 
             model = "llava:latest"  # better fallback for vision
         else:
             env_model = os.getenv('OLLAMA_MODEL', ollama_models[0] if ollama_models else 'mistral:latest')
@@ -129,21 +125,8 @@ def configure_model_settings():
             if ollama_models:
                 st.info(f"📊 Found {len(ollama_models)} available models")
                 
-                # Check if selected model supports vision
-                vision_models = ['llava', 'gemma3', 'qwen2-vl', 'minicpm-v', 'bakllava', 'moondream']
-                is_vision_model = any(vm in model.lower() for vm in vision_models)
-                
-                if not is_vision_model:
-                    st.warning("⚠️ Selected model may not support vision! PDF processing might fail.")
-                    st.info("💡 **Best model**: minicpm-v:latest | **Alternative**: llava:latest, llava:7b")
-                else:
-                    st.success("✅ Vision-capable model selected")
-                    # Extra encouragement for minicpm-v models
-                    if 'minicpm-v' in model.lower():
-                        st.info("🔥 **minicpm-v models have excellent text accuracy for PDF processing!**")
-                        st.warning("⏱️ **Note:** minicpm-v is slower but more accurate than llava models")
-                    elif 'llava' in model.lower():
-                        st.info("✅ **llava models are good for PDF processing**")
+
+
                 
                 # Option to add custom model
                 custom_model = st.text_input(
@@ -305,12 +288,9 @@ def configure_api_settings():
         
         st.session_state.openai_api_key = "ollama"
         st.session_state.openai_api_base = ollama_base_url
-        st.success("✅ Ollama configured for local AI processing")
+        st.success("✅ Ollama configured (slower results than OpenAI)")
         st.info("💡 Make sure Ollama is running locally and your model is available")
         
-        # Info about Ollama quality
-        st.info("💡 **For best results:** Use OpenAI GPT-4 Vision or minicpm-v:latest (Ollama)")
-        st.warning("⚠️ **Note:** Some Ollama models may be less accurate than OpenAI")
 
 def configure_page_options() -> Tuple[int, int]:
     """Configure page range options"""
