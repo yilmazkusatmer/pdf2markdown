@@ -29,7 +29,7 @@ class ProcessingError(Exception):
     pass
 
 
-class MarkPDFDownProcessor:
+class PdfToMarkdownProcessor:
     """
     Main processor class for converting PDFs to Markdown using AI.
     

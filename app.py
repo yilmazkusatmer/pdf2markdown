@@ -25,7 +25,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Import markpdfdown core functionality
-from markpdfdown_core import MarkPDFDownProcessor, ProcessingError
+from pdf2markdown_core import PdfToMarkdownProcessor, ProcessingError
 
 def main():
     """Main Streamlit application function"""
@@ -241,7 +241,7 @@ def process_pdf_file(uploaded_file, page_range: Tuple[int, int], model_config: d
         )
         progress_bar.progress(10)
         
-        processor = MarkPDFDownProcessor(
+        processor = PdfToMarkdownProcessor(
             api_key=st.session_state.openai_api_key,
             api_base=getattr(st.session_state, 'openai_api_base', 'https://api.openai.com/v1/'),
             model=model_config["model"]
